@@ -4,7 +4,6 @@ import random
 import sys
 from tarski.io import PDDLReader, FstripsWriter
 
-
 def reCreateDir(dirName):
     # Check whether the specified path exists or not
     isExist = os.path.exists(dirName)
