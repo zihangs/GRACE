@@ -1,17 +1,5 @@
 import os
-import shutil
 import sys
-
-
-def safeCreateDir(dirName):
-    # Check whether the specified path exists or not
-    isExist = os.path.exists(dirName)
-    if isExist:
-        # delete
-        shutil.rmtree(dirName)
-    
-    os.makedirs(dirName)
-
 
 
 if __name__ == "__main__":

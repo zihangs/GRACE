@@ -35,30 +35,12 @@
     
 
     
-    (:action unlock
-     :parameters (?curpos - place ?lockpos - place ?key - key ?shape - shape)
-     :precondition (and (conn ?curpos ?lockpos) (key-shape ?key ?shape) (lock-shape ?lockpos ?shape) (at-robot ?curpos) (locked ?lockpos) (carrying ?key))
+    (:action disconnect
+     :parameters (?place1 - place ?place2 - place)
+     :precondition (and (conn ?place1 ?place2) (conn ?place2 ?place1))
      :effect (and
-        (open ?lockpos)
-        (not (locked ?lockpos)))
-    )
-
-
-    (:action move
-     :parameters (?curpos - place ?nextpos - place)
-     :precondition (and (at-robot ?curpos) (conn ?curpos ?nextpos) (open ?nextpos))
-     :effect (and
-        (at-robot ?nextpos)
-        (not (at-robot ?curpos)))
-    )
-
-
-    (:action pickup
-     :parameters (?curpos - place ?key - key)
-     :precondition (and (at-robot ?curpos) (at ?key ?curpos))
-     :effect (and
-        (carrying ?key)
-        (not (at ?key ?curpos)))
+        (not (conn ?place1 ?place2))
+        (not (conn ?place2 ?place1)))
     )
 
 )

@@ -22,7 +22,8 @@ def loadPDDLProblem(domainFile, problemFile):
 def setGoal(problemFile, hypsFile, index=0):
     f = open(hypsFile, "r")
     goals = f.read().split("\n")
-    selectedGoal = goals[index]
+    # selectedGoal = goals[index]
+    selectedGoal = "(and )"
     f.close()
     f = open(problemFile, "r")
     template = f.read()
