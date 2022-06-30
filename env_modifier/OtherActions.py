@@ -3,7 +3,6 @@ import random
 
 from tarski.io import FstripsWriter
 from tarski.search.model import GroundForwardSearchModel
-from tarski.search.blind import BreadthFirstSearch
 from tarski.grounding.lp_grounding import ground_problem_schemas_into_plain_operators
 from generalFunc import loadPDDLProblem, setGoal, restoreTemplate, reCreateDir
 
@@ -14,10 +13,6 @@ def randomWalk(problem, steps):
     
 
     gfs_model = GroundForwardSearchModel(problem, ground_problem_schemas_into_plain_operators(problem))
-
-    bfs_model = BreadthFirstSearch(gfs_model)
-
-    
 
     prevState = ""
     currState = problem.init
@@ -61,7 +56,7 @@ def randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile):
 
 if __name__ == "__main__":
     # steps of random walk:
-    steps = 5
+    steps = 1
 
     # original files:
     # oriDomainFile = "original/domain.pddl"

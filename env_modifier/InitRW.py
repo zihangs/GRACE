@@ -4,7 +4,7 @@ import random
 from tarski.io import FstripsWriter
 from tarski.search.model import GroundForwardSearchModel
 from tarski.grounding.lp_grounding import ground_problem_schemas_into_plain_operators
-from generalFunc import loadPDDLProblem, setGoal, restoreTemplate, reCreateDir
+from generalFunc import loadPDDLProblem, restoreTemplate, reCreateDir, setHyps
 
 
 
@@ -37,15 +37,15 @@ def randomWalk(problem, steps):
 
 
 def randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile):
-    selectedGoal, tmpFile = setGoal(oriTemplateFile, oriHypsFile)
+    selectedGoal, tmpFile = setHyps(oriTemplateFile, oriHypsFile)
     
     problem = loadPDDLProblem(oriDomainFile, tmpFile)
     problem = randomWalk(problem, steps)
 
     writer = FstripsWriter(problem)
     writer.write("newDomain.pddl", tmpFile)
-
     restoreTemplate(tmpFile, "newTemplate.pddl", selectedGoal)
+
     reCreateDir("modified")
     shutil.move("newDomain.pddl", "modified/domain.pddl")
     shutil.move("newTemplate.pddl", "modified/template.pddl")
@@ -53,6 +53,7 @@ def randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile):
 
 
 if __name__ == "__main__":
+    #############################################################
     # steps of random walk:
     steps = 50
 
@@ -60,6 +61,7 @@ if __name__ == "__main__":
     oriDomainFile = "original/domain.pddl"
     oriTemplateFile = "original/template.pddl"
     oriHypsFile = "original/hyps.dat"
+    #############################################################
 
     randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile)
 

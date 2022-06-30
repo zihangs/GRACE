@@ -1,7 +1,7 @@
 import shutil
 import random
 from tarski.io import FstripsWriter
-from generalFunc import loadPDDLProblem, setGoal, restoreTemplate, reCreateDir
+from generalFunc import loadPDDLProblem, setHyps, restoreTemplate, reCreateDir
 
 def removeObj(problem, obj):
     lang = problem.language
@@ -20,12 +20,12 @@ def removeObj(problem, obj):
         if toRemove:
             problem.init.remove(p, *lst)
     
-    del lang._constants[str(obj)]
+    del lang._constants[str(obj)]  # delete the obj from the list
     return problem
 
 
 def randomRemoveObj(numRemove, oriDomainFile, oriTemplateFile, oriHypsFile):
-    selectedGoal, tmpFile = setGoal(oriTemplateFile, oriHypsFile)
+    selectedGoal, tmpFile = setHyps(oriTemplateFile, oriHypsFile)
 
     problem = loadPDDLProblem(oriDomainFile, tmpFile)
     lang = problem.language
@@ -49,6 +49,7 @@ def randomRemoveObj(numRemove, oriDomainFile, oriTemplateFile, oriHypsFile):
 
 
 if __name__ == "__main__":
+    ###############################################################
     # number of object to remove:
     numRemove = 5
 
@@ -56,9 +57,12 @@ if __name__ == "__main__":
     oriDomainFile = "original/domain.pddl"
     oriTemplateFile = "original/template.pddl"
     oriHypsFile = "original/hyps.dat"
+    ###############################################################
 
-    seed = random.randint(0,10000)
-    random.seed(seed)  #to replicate the result of paper
+    # seed = random.randint(0,10000)
+    # random.seed(seed)  #to replicate the result of paper
+    # print(seed)
+
     randomRemoveObj(numRemove, oriDomainFile, oriTemplateFile, oriHypsFile)
-    print(seed)
+    
 

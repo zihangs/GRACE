@@ -21,5 +21,15 @@ docker container start xenodochial_poitras -i
 
 3. random walk from goal
 
-
 use other action to change env by planner:
+
+
+
+commands: (only modify a single environment)
+
+```sh
+python env_modifier.py original -InitRW 10
+
+python env_modifier.py original -ObjectRM 5
+```
+
