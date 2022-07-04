@@ -13,7 +13,7 @@ def iterativeModify(args):
     # lapkt timeout
     timeout = 10
     # try to generate valid env for 20 times
-    attempts = 20
+    attempts = 10
 
     modifySucceed = False
     for i in range(attempts):

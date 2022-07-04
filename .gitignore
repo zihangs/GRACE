@@ -1,0 +1,10 @@
+env_modifier/__pycache__/
+env_modifier/changed/
+env_modifier/changed_domain_models/
+env_modifier/legacy/
+env_modifier/minidata/
+env_modifier/miniout/
+env_modifier/miniout_problems/
+env_modifier/miniout_templates/
+env_modifier/original/
+env_modifier/segfault/

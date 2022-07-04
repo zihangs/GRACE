@@ -4,10 +4,13 @@ from func_timeout import func_timeout
 # Load the default planner
 from lapkt.load_planner import Planner
 from generalFunc import setHyps, safeRemoveFile
+from time import *
+from multiprocessing import Process
 
+def runSearch(timeout, optPlanner):
+  func_timeout(timeout, optPlanner.solve, args=(), kwargs=None)
 
 def validate(timeout, domain, template, hyps):
-
   # BrFS Planner configuration (Optimal Planner)
   config_BRFS = {
             'log_file': {'var_name': 'log_filename', 'value': 'log'}, 
@@ -25,7 +28,7 @@ def validate(timeout, domain, template, hyps):
   isAllValid = True
 
   for index in range(goalCount):
-    selectedHyps, tmpProblem = setHyps(template, hyps, index=index)
+    _, tmpProblem = setHyps(template, hyps, index=index)
 
     # Set PDDL domain and problem file path in the planner configuration
     config_BRFS['domain'] = {'value': domain}
@@ -40,7 +43,21 @@ def validate(timeout, domain, template, hyps):
 
     #### timeout (may be able to find a plan, but it will spend too much time)
     try:
-      func_timeout(timeout, optPlanner.solve, args=(), kwargs=None)
+      p2 = Process(target=runSearch, args=(timeout, optPlanner,))
+      p2.start()
+
+      i = 0
+      while i < timeout:
+        sleep(1)
+        i += 1
+
+      if p2.is_alive():
+        p2.terminate()
+        isAllValid = False
+        break
+      else:
+        pass
+
     except:
       isAllValid = False
       break
@@ -55,9 +72,9 @@ if __name__ == "__main__":
   # problem = sys.argv[2]
   timeout = 10
 
-  domain = "modified/domain.pddl"
-  template = "modified/template.pddl"
-  hyps = "modified/hyps.dat"
+  domain = "segfault/domain.pddl"
+  template = "segfault/template.pddl"
+  hyps = "segfault/hyps.dat"
 
   print( validate(timeout, domain, template, hyps) )
 

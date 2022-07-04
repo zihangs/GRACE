@@ -68,3 +68,32 @@ def restoreTemplate(tmpFile, newTemplateFile, selectedHyps):
     f.write(newTemplate)
     f.close()
     os.rename(tmpFile, newTemplateFile)
+
+
+# input: a env with template, output: a env have multiple subdir (template filled with goals in hyps.dat)
+def templateFillGoals(inputDir, outputDir):
+    reCreateDir(outputDir)
+
+    f_template = open(inputDir + "/template.pddl", "r")
+    strTemplate = f_template.read()
+    f_template.close()
+
+    f_hyps = open(inputDir + "/hyps.dat", "r")
+    hyps = f_hyps.readlines() # get goals
+    f_hyps.close()
+
+    goal = 0
+    for h in hyps:
+        if h:  # if it's not an empty line
+            goalDir = outputDir + "/goal_" + str(goal)
+            reCreateDir(goalDir)
+            shutil.copyfile(inputDir + "/domain.pddl", goalDir + "/domain.pddl")
+            
+            strWithHyp = strTemplate.replace("<HYPOTHESIS>", h)
+            f_write_to = open(goalDir + "/problem.pddl", "w")
+            f_write_to.write(strWithHyp)
+            f_write_to.close()
+
+            # goal
+            goal += 1
+
