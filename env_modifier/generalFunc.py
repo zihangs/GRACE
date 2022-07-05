@@ -89,6 +89,8 @@ def templateFillGoals(inputDir, outputDir):
             reCreateDir(goalDir)
             shutil.copyfile(inputDir + "/domain.pddl", goalDir + "/domain.pddl")
             
+            #remove comma
+            h = h.replace(",", " ")
             strWithHyp = strTemplate.replace("<HYPOTHESIS>", h)
             f_write_to = open(goalDir + "/problem.pddl", "w")
             f_write_to.write(strWithHyp)

@@ -48,7 +48,7 @@ output_templates = "miniout_templates"
 output_plan_problems = "miniout_problems"
 
 # args[1] will be replaced
-args = ["env_modifier.py", "original", "-InitRW", "5"]
+args = ["env_modifier.py", "original", "-InitRW", "10"]
 
 safeCreateDir(output_templates)
 safeCreateDir(output_plan_problems)
