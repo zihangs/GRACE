@@ -38,6 +38,18 @@ It will take a long time to run.
 
 
 
+```sh
+./fast-downward.py domain.pddl problem.pddl --search "symk-bd(plan_selection=top_k(num_plans=10))"
+```
+
+
+
+
+
+./fast-downward.py domain.pddl problem.pddl --search "symk-bd(plan_selection=top_k(num_plans=10))"
+
+
+
 ### Outputs
 
 Once the process is completed, check this directory, there will be a sub-directory `gene_data/`. All the domains, problems, tests and generated plans will be there. Then this directory will be used for our next steps for mining process models.

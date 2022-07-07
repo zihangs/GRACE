@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 import re
 import shutil
@@ -22,7 +23,7 @@ def listAllSubDir(path, flag="default"):
     if flag == "sorted":
         pathList = sortByLastNumber(pathList)
     if flag == "shuffled":
-        pathList = random.shuffle(pathList)
+        random.shuffle(pathList)
     return pathList
 
 
@@ -37,7 +38,7 @@ def listAllSubFile(path, flag="default"):
     if flag == "sorted":
         fileList = sortByLastNumber(fileList)
     if flag == "shuffled":
-        fileList = random.shuffle(fileList)
+        random.shuffle(fileList)
     return fileList
 
 
@@ -70,7 +71,7 @@ def createProblemStructure(rootPath):
     problemStructure = []
     numberOfEnv = 0
     numberOfGoal = 0
-    numberOfCase = 0
+    numberOfCaseLeast = float('inf')  # set an infinity number
 
     envList = listAllSubDir(rootPath, "sorted")
     numberOfEnv = len(envList)
@@ -79,27 +80,32 @@ def createProblemStructure(rootPath):
         goalList = listAllSubDir(env, "sorted")
         numberOfGoal = len(goalList)
         for goal in goalList:
-            caseList = listAllSubFile(goal, "sorted")
-            numberOfCase = len(caseList)
+            caseList = listAllSubFile(goal, "shuffled")    ###################
+            if len(caseList) < numberOfCaseLeast:
+                numberOfCaseLeast = len(caseList)
             tmpList.append(caseList)
 
         problemStructure.append(tmpList)
         
-    return numberOfEnv, numberOfGoal, numberOfCase, problemStructure
+    return numberOfEnv, numberOfGoal, numberOfCaseLeast, problemStructure
 
 
 
 class DriftGenerator:
-    def __init__(self, numberOfEnv, numberOfGoal, numberOfCase, problemStructure):
+    def __init__(self, numberOfEnv, numberOfGoal, numberOfCaseLeast, problemStructure):
         self.numberOfEnv = numberOfEnv
         self.numberOfGoal = numberOfGoal
-        self.numberOfCase = numberOfCase
+        self.numberOfCaseLeast = numberOfCaseLeast
         self.problemStructure = problemStructure
+        self.outputDir = "outputDrift"
+
+        print(numberOfCaseLeast)
         
     # eg: numberPerCase = 200
     # sudden drift: drift happen when each goal have selected "numberPerCase" of cases
     def sudden(self, numberPerCase):
-        dstDir = "sudden"
+        # dstDir = "sudden"
+        dstDir = self.outputDir
         safeCreateDir(dstDir)
         
         caseID = []
@@ -109,7 +115,7 @@ class DriftGenerator:
         envId = 0
         while envId < self.numberOfEnv:
             currCollected = 0
-            while currCollected < numberPerCase:
+            while (currCollected < numberPerCase) and (currCollected < self.numberOfCaseLeast):
                 for goalId in range(self.numberOfGoal):
                     case = problemStructure[envId][goalId][currCollected]
                     # print(case)
@@ -132,7 +138,8 @@ class DriftGenerator:
             
     # numberPerCase = 200, reoccurTimes = 3, 
     def reoccuring(self, numberPerCase, reoccurTimes):
-        dstDir = "reoccuring"
+        # dstDir = "reoccuring"
+        dstDir = self.outputDir
         safeCreateDir(dstDir)
                
         caseCount = 0
@@ -158,7 +165,8 @@ class DriftGenerator:
      
     # numberPerCase = 200, graduateChangeCases = 100
     def gradual(self, numberPerCase, graduateChangeCases, periodList = ["normal", "gradual", "normal"]):
-        dstDir = "gradual"
+        # dstDir = "gradual"
+        dstDir = self.outputDir
         safeCreateDir(dstDir)
         
         caseCount = 0
@@ -202,7 +210,8 @@ class DriftGenerator:
     
     # probOutlier = 0.05, numberPerCase = 300
     def outlier(self, numberPerCase, probOutlier):
-        dstDir = "outlier"
+        # dstDir = "outlier"
+        dstDir = self.outputDir
         safeCreateDir(dstDir)
         
         caseCount = 0
@@ -219,10 +228,82 @@ class DriftGenerator:
                 copyName = "sas_plan.%s" % str(caseCount)
                 shutil.copyfile(case, dstDir + "/" + copyName)
             currCollected += 1
+
+    def incremental(self, numberPerCase, numEnv):
+        # dstDir = "incremental"
+        dstDir = self.outputDir
+        safeCreateDir(dstDir)
+        
+        caseID = []
+        env = []
+        goal = []
+        
+        caseCount = 0
+        envId = 0
+        
+        not_intermediate = True
+        
+        while envId < self.numberOfEnv:
+            if not_intermediate:
+                currCollected = 0
+                while currCollected < numberPerCase:
+                    goalId = random.randint(0, self.numberOfGoal-1)
+                    case = problemStructure[envId][goalId][currCollected]
+                    # print(case)
+
+                    caseCount += 1
+                    caseID.append(caseCount)
+                    env.append(envId/numEnv)
+                    goal.append(goalId+1)
+
+                    copyName = "sas_plan.%s" % str(caseCount)
+                    shutil.copyfile(case, dstDir + "/" + copyName)        
+                    currCollected += 1
+                envId += 1
+                not_intermediate = False
+            else:
+                currCollected = 0
+                goalId = random.randint(0, self.numberOfGoal-1)
+                case = problemStructure[envId][goalId][currCollected]
+                # print(case)
+
+                caseCount += 1
+                caseID.append(caseCount)
+                env.append(envId/numEnv)
+                goal.append(goalId+1)
+
+                copyName = "sas_plan.%s" % str(caseCount)
+                shutil.copyfile(case, dstDir + "/" + copyName)        
+                currCollected += 1
+                
+                envId += 1
+                if envId == numEnv:
+                    not_intermediate = True
+                    
+                
+        d = {"caseID": caseID, "env": env, "goal": goal}
+        df = pd.DataFrame(data=d)
+        return df
         
 
 
-# main
-numberOfEnv, numberOfGoal, numberOfCase, problemStructure = createProblemStructure("a_problem")
-        
-dg = DriftGenerator(numberOfEnv, numberOfGoal, numberOfCase, problemStructure)
+if __name__ == "__main__":
+    # python3 driftGenerator.py block-words_p01 -Gradual 50 50
+    # plan_pool = "block-words_p01"
+    # option = "-Gradual"
+
+    plan_pool = sys.argv[1]
+    option = sys.argv[2]
+    
+    # create the structure of cases and a generator instance
+    numberOfEnv, numberOfGoal, numberOfCase, problemStructure = createProblemStructure(plan_pool)
+    dg = DriftGenerator(numberOfEnv, numberOfGoal, numberOfCase, problemStructure)
+    if option == "-Sudden":
+        cases_per_env = int(sys.argv[3])
+        dg.sudden(cases_per_env)
+
+    if option == "-Gradual":
+        stable_period = int(sys.argv[3])
+        changing_period = int(sys.argv[4])
+        dg.gradual(stable_period, changing_period)
+

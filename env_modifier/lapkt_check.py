@@ -1,4 +1,4 @@
-## Notice: only works on windows and linux (suggest to build a container)
+## Notice: only works on windows and linux
 
 from func_timeout import func_timeout
 # Load the default planner

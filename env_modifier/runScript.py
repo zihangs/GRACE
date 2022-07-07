@@ -2,6 +2,7 @@
 import os
 import re
 import random
+import sys
 import shutil
 from env_modifier import iterativeModify
 from generalFunc import templateFillGoals
@@ -43,50 +44,50 @@ def safeCreateDir(dirName):
 
 
 ##############################################
-data = "minidata"
-output_templates = "miniout_templates"
-output_plan_problems = "miniout_problems"
+# args_script = ["runScript.py", "source_data", "-InitRW", "10", lapktTimeout, lapktAttempts]
+args_script = sys.argv
+lapktTimeout = int(sys.argv[-2])
+lapktAttempts = int(sys.argv[-1])
+
+src_data = args_script[1]
+output_templates = src_data + "_output_templates"
+output_plan_problems = src_data + "_output_problems"
+
 
 # args[1] will be replaced
-args = ["env_modifier.py", "original", "-InitRW", "10"]
+# args_env_modifier = ["env_modifier.py", "dirOfDomainTemplateHyps", "-InitRW", "10"]
 
 safeCreateDir(output_templates)
 safeCreateDir(output_plan_problems)
 
-domains = listAllSubDir(data)
+# create dir for each domain in src_data (store problem/template format)
+domains = listAllSubDir(src_data)
 for domain in domains:
     problems = listAllSubDir(domain)
-    outputDomain_templates = domain.replace(data, output_templates)
-    outputDomain_problems = domain.replace(data, output_plan_problems)
-    safeCreateDir(outputDomain_templates)
-    safeCreateDir(outputDomain_problems)
+    a_domain_template = domain.replace(src_data, output_templates)
+    a_domain_problem = domain.replace(src_data, output_plan_problems)
+    safeCreateDir(a_domain_template)
+    safeCreateDir(a_domain_problem)
 
-    count = 0
-    for problem in problems:
-        print(problem)
-        args[1] = problem
+    # modifier env for each problem in the domain (a problem: domain, template, hyps)
+    for problem_dir in problems:
+        args_env_modifier = args_script
+        args_env_modifier[0] = "env_modifier.py"
+        args_env_modifier[1] = problem_dir
         # exec
-        status = iterativeModify(args)
-        # move modified into
+        status = iterativeModify(args_env_modifier, timeout=lapktTimeout, attempts=lapktAttempts)
+
         if status:
-            count += 1
-            # shutil.move("modified/", outputDomain + "/problem_" + str(count))
-            
-            outputProblems = problem.replace(data, output_plan_problems)
-            # env0
-            templateFillGoals(args[1], outputProblems + "/env0")
-            # env1
-            templateFillGoals("modified", outputProblems + "/env1")
+            problem_dir_output = problem_dir.replace(src_data, output_plan_problems)
 
+            # env0: copy and fill original template, generate env0
+            templateFillGoals(problem_dir, problem_dir_output + "/env0")
+            # env1: copy and fill modified template, generate env1
+            templateFillGoals("modified", problem_dir_output + "/env1")
 
-
-            outputTemplates = problem.replace(data, output_templates)
-            shutil.move("modified/", outputTemplates)
-
-
-
-
-
-
+            # move modified/ to output_templates/ (this is in template format)
+            template_dir_output = problem_dir.replace(src_data, output_templates)
+            # move and rename
+            shutil.move("modified/", template_dir_output)
 
 
