@@ -11,7 +11,7 @@ def iterativeModify(args, timeout = 10, attempts = 20):
     method = args[2]  # "-ObjectRM", "-InitRW", "-GoalRW", "-ActionRM"
 
     modifySucceed = False
-    for i in range(attempts):
+    for _ in range(attempts):
         if method == "-ObjectRM":
             numRemove = int(args[3])
             ObjectRM.randomRemoveObj(numRemove, oriDomainFile, oriTemplateFile, oriHypsFile)

@@ -33,6 +33,7 @@ sudden_cases_per_env = 50
 gradual_stable_period = 50
 gradual_changing_period = 50
 
+
 ############################## env_modifier #############################
 # change dir to modifier and run 
 os.chdir("./env_modifier")
@@ -45,90 +46,89 @@ if env_change_option == "-InitRW":
 output_fill_goals = src_envs + "_output_problems"
 # change dir back
 os.chdir("../")
-################################### planner ###############################
-src_problems = output_fill_goals
+# ################################### planner ###############################
+# src_problems = output_fill_goals
 
-if planner_option == "-Topk":
-    # move the output_fill_goals to planner
-    safeRemoveDir("./planner/symk/" + src_problems)
-    shutil.copytree("./env_modifier/" + src_problems, "./planner/symk/" + src_problems)
-    # shutil.move("./env_modifier/" + src_problems, "./planner/symk/")
-    # change dir to symk planner
-    os.chdir("./planner/symk/")
-    os.system("python3 genePlans.py %s %s %s" % (src_problems, str(numPlans), str(timeLimit)) )
-
-
-# the plans are directly added into "src_problems"
-# move some plans out to *** training set ***
-reCreateDir("training")
-for domain in os.listdir(src_problems):
-    if str(domain)[0] == ".":
-        continue
-    pathOfDomain = src_problems + "/" + str(domain)
-    pathOfDomain_training = "training/" + str(domain)
-    reCreateDir(pathOfDomain_training)
-
-    for a_problem in os.listdir(pathOfDomain):
-        if str(a_problem)[0] == ".":
-            continue
-        pathOfProblem = pathOfDomain + "/" + str(a_problem)
-        pathOfProblem_training = pathOfDomain_training + "/" + str(a_problem)
-        reCreateDir(pathOfProblem_training)
-
-        for an_env in os.listdir(pathOfProblem):
-            if an_env == "env0":
-                for a_goal in os.listdir(pathOfProblem +"/env0"):
-                    if str(a_goal)[0] == ".":
-                        continue
-                    pathOfGoal = pathOfProblem + "/env0/" + str(a_goal)
-                    pathOfGoal_training = pathOfProblem_training + "/" + str(a_goal)
-                    reCreateDir(pathOfGoal_training)
-
-                    for a_plan in os.listdir(pathOfGoal):
-                        # move
-                        nameList = a_plan.split(".")
-                        if int(nameList[1]) <= trainingPlanPerGoal:
-                            shutil.move(pathOfGoal + "/" + a_plan, pathOfGoal_training)
-
-# the plans are directly added into "src_problems"
-output_plans = src_problems
-# change dir back
-os.chdir("../../")
-############################## drift generator ##############################
-output_plans = "minidata_output_problems"
-
-safeRemoveDir("./drift_generator/" + output_plans)
-shutil.copytree("./planner/symk/" + output_plans, "./drift_generator/" + output_plans)
-# move it to drift_generator/
-# shutil.move("./planner/symk/" + output_plans, "./drift_generator/")
-# change dir to drift_generator/
-os.chdir("./drift_generator/")
-
-plan_pool_root = output_plans
-for domain in os.listdir(plan_pool_root):
-    if str(domain)[0] == ".":
-        continue
-
-    pathOfDomain = plan_pool_root + "/" + str(domain)
-    for a_problem in os.listdir(pathOfDomain):
-        if str(a_problem)[0] == ".":
-            continue
-
-        problemPath = pathOfDomain + "/" + str(a_problem)
-
-        # random_select_goal or give_all_goal:
-        if drift_option == "-Sudden":
-            os.system("python3 driftGenerator.py %s %s %s" % (problemPath, drift_option, str(sudden_cases_per_env)) )
-        if drift_option == "-Gradual":
-            os.system("python3 driftGenerator.py %s %s %s %s" % (problemPath, drift_option, str(gradual_stable_period), str(gradual_changing_period)) )
+# if planner_option == "-Topk":
+#     # move the output_fill_goals to planner
+#     safeRemoveDir("./planner/symk/" + src_problems)
+#     shutil.copytree("./env_modifier/" + src_problems, "./planner/symk/" + src_problems)
+#     # shutil.move("./env_modifier/" + src_problems, "./planner/symk/")
+#     # change dir to symk planner
+#     os.chdir("./planner/symk/")
+#     os.system("python3 genePlans.py %s %s %s" % (src_problems, str(numPlans), str(timeLimit)) )
 
 
-        # remove the original pools of plans, the output is a sequence of plans (a drift)
-        os.system("rm -rf %s/" % problemPath)
-        # output for all types of drifts are the same: outputDrift/
-        os.system("mv outputDrift/ %s/" % problemPath)
+# # the plans are directly added into "src_problems"
+# # move some plans out to *** training set ***
+# reCreateDir("training")
+# for domain in os.listdir(src_problems):
+#     if str(domain)[0] == ".":
+#         continue
+#     pathOfDomain = src_problems + "/" + str(domain)
+#     pathOfDomain_training = "training/" + str(domain)
+#     reCreateDir(pathOfDomain_training)
+
+#     for a_problem in os.listdir(pathOfDomain):
+#         if str(a_problem)[0] == ".":
+#             continue
+#         pathOfProblem = pathOfDomain + "/" + str(a_problem)
+#         pathOfProblem_training = pathOfDomain_training + "/" + str(a_problem)
+#         reCreateDir(pathOfProblem_training)
+
+#         for an_env in os.listdir(pathOfProblem):
+#             if an_env == "env0":
+#                 for a_goal in os.listdir(pathOfProblem +"/env0"):
+#                     if str(a_goal)[0] == ".":
+#                         continue
+#                     pathOfGoal = pathOfProblem + "/env0/" + str(a_goal)
+#                     pathOfGoal_training = pathOfProblem_training + "/" + str(a_goal)
+#                     reCreateDir(pathOfGoal_training)
+
+#                     for a_plan in os.listdir(pathOfGoal):
+#                         # move
+#                         nameList = a_plan.split(".")
+#                         if int(nameList[1]) <= trainingPlanPerGoal:
+#                             shutil.move(pathOfGoal + "/" + a_plan, pathOfGoal_training)
+
+# # the plans are directly added into "src_problems"
+# output_plans = src_problems
+# # change dir back
+# os.chdir("../../")
+# ############################## drift generator ##############################
+
+# safeRemoveDir("./drift_generator/" + output_plans)
+# shutil.copytree("./planner/symk/" + output_plans, "./drift_generator/" + output_plans)
+# # move it to drift_generator/
+# # shutil.move("./planner/symk/" + output_plans, "./drift_generator/")
+# # change dir to drift_generator/
+# os.chdir("./drift_generator/")
+
+# plan_pool_root = output_plans
+# for domain in os.listdir(plan_pool_root):
+#     if str(domain)[0] == ".":
+#         continue
+
+#     pathOfDomain = plan_pool_root + "/" + str(domain)
+#     for a_problem in os.listdir(pathOfDomain):
+#         if str(a_problem)[0] == ".":
+#             continue
+
+#         problemPath = pathOfDomain + "/" + str(a_problem)
+
+#         # random_select_goal or give_all_goal:
+#         if drift_option == "-Sudden":
+#             os.system("python3 driftGenerator.py %s %s %s" % (problemPath, drift_option, str(sudden_cases_per_env)) )
+#         if drift_option == "-Gradual":
+#             os.system("python3 driftGenerator.py %s %s %s %s" % (problemPath, drift_option, str(gradual_stable_period), str(gradual_changing_period)) )
 
 
-# change dir back
-os.chdir("../")
+#         # remove the original pools of plans, the output is a sequence of plans (a drift)
+#         os.system("rm -rf %s/" % problemPath)
+#         # output for all types of drifts are the same: outputDrift/
+#         os.system("mv outputDrift/ %s/" % problemPath)
+
+
+# # change dir back
+# os.chdir("../")
 

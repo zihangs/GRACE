@@ -6,6 +6,7 @@ import sys
 import shutil
 from env_modifier import iterativeModify
 from generalFunc import templateFillGoals
+from lapkt_check import validate_steps_goals
 
 def listAllSubDir(path, flag="default"):
     pathList = []
@@ -74,6 +75,16 @@ for domain in domains:
         args_env_modifier = args_script
         args_env_modifier[0] = "env_modifier.py"
         args_env_modifier[1] = problem_dir
+
+        # check steps: (check the original problem only once):   for random walk:
+        valid_flag, steps, _ = validate_steps_goals(lapktTimeout, problem_dir+"/domain.pddl", problem_dir+"/template.pddl", problem_dir+"/hyps.dat")
+        if valid_flag:     # then modify environment next
+            args_env_modifier[3] = str(steps)
+
+            print( "steps = " + str(steps) )
+        else:
+            continue   # the original problem is invalid, go to next problem
+
         # exec
         status = iterativeModify(args_env_modifier, timeout=lapktTimeout, attempts=lapktAttempts)
 
