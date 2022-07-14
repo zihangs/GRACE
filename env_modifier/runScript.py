@@ -4,6 +4,7 @@ import re
 import random
 import sys
 import shutil
+from math import ceil
 from env_modifier import iterativeModify
 from generalFunc import templateFillGoals
 from lapkt_check import validate_steps_goals
@@ -61,6 +62,9 @@ output_plan_problems = src_data + "_output_problems"
 safeCreateDir(output_templates)
 safeCreateDir(output_plan_problems)
 
+# record the number of goals:
+f_goal_count = open("goal_count.csv", "w")
+
 # create dir for each domain in src_data (store problem/template format)
 domains = listAllSubDir(src_data)
 for domain in domains:
@@ -76,19 +80,32 @@ for domain in domains:
         args_env_modifier[0] = "env_modifier.py"
         args_env_modifier[1] = problem_dir
 
+
+
+
+
         # check steps: (check the original problem only once):   for random walk:
         valid_flag, steps, _ = validate_steps_goals(lapktTimeout, problem_dir+"/domain.pddl", problem_dir+"/template.pddl", problem_dir+"/hyps.dat")
         if valid_flag:     # then modify environment next
-            args_env_modifier[3] = str(steps)
+            # replace args[3] with real step number
+            stepsNum = ceil( float(args_env_modifier[3]) * steps ) 
+            args_env_modifier[3] = str( stepsNum )
 
-            print( "steps = " + str(steps) )
+            print( "steps = " + str(steps) )  # this is average of steps
         else:
             continue   # the original problem is invalid, go to next problem
 
+
+
+
+
+
         # exec
-        status = iterativeModify(args_env_modifier, timeout=lapktTimeout, attempts=lapktAttempts)
+        status, goals = iterativeModify(args_env_modifier, timeout=lapktTimeout, attempts=lapktAttempts)
 
         if status:
+            f_goal_count.write(problem_dir + "," + str(goals) + "\n")
+
             problem_dir_output = problem_dir.replace(src_data, output_plan_problems)
 
             # env0: copy and fill original template, generate env0
@@ -102,3 +119,4 @@ for domain in domains:
             shutil.move("modified/", template_dir_output)
 
 
+f_goal_count.close()

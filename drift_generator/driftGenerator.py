@@ -104,43 +104,46 @@ class DriftGenerator:
     # eg: numberPerCase = 200
     # sudden drift: drift happen when each goal have selected "numberPerCase" of cases
     def sudden(self, numberPerCase):
-        # dstDir = "sudden"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
         
         caseID = []
         env = []
+        goal = []
         
         caseCount = 0
         envId = 0
         while envId < self.numberOfEnv:
             currCollected = 0
-            while (currCollected < numberPerCase) and (currCollected < self.numberOfCaseLeast):
-                for goalId in range(self.numberOfGoal):
-                    case = problemStructure[envId][goalId][currCollected]
-                    # print(case)
-                    
-                    caseCount += 1
-                    caseID.append(caseCount)
-                    env.append(envId)
-                    
-                    copyName = "sas_plan.%s" % str(caseCount)
-                    shutil.copyfile(case, dstDir + "/" + copyName)        
+            while currCollected < numberPerCase:
+                goalId = random.randint(0, self.numberOfGoal-1)
+                case = problemStructure[envId][goalId][currCollected]
+                # print(case)
+
+                caseCount += 1
+                caseID.append(caseCount)
+                env.append(envId)
+                goal.append(goalId+1)
+
+                copyName = "sas_plan.%s" % str(caseCount)
+                shutil.copyfile(case, dstDir + "/" + copyName)        
                 currCollected += 1
             envId += 1
             
-        d = {"caseID": caseID, "env": env}
+        d = {"caseID": caseID, "env": env, "goal": goal}
         df = pd.DataFrame(data=d)
-        # print(df)
         return df
         
         
             
     # numberPerCase = 200, reoccurTimes = 3, 
     def reoccuring(self, numberPerCase, reoccurTimes):
-        # dstDir = "reoccuring"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
+        
+        caseID = []
+        env = []
+        goal = []
                
         caseCount = 0
         copyStructure = copy.deepcopy(self.problemStructure)
@@ -150,22 +153,29 @@ class DriftGenerator:
             while envId < self.numberOfEnv:
                 currCollected = 0
                 while currCollected < numberPerCase:
-                    for goalId in range(numberOfGoal):
-                        # need pop out the first item
-                        case = copyStructure[envId][goalId].pop(0)
-                        print(case)
-                        caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
-                        shutil.copyfile(case, dstDir + "/" + copyName) 
+                    goalId = random.randint(0, self.numberOfGoal-1)
+                    # need pop out the first item
+                    case = copyStructure[envId][goalId].pop(0)
+
+                    caseCount += 1
+                    caseID.append(caseCount)
+                    env.append(envId)
+                    goal.append(goalId+1)
+
+                    copyName = "sas_plan.%s" % str(caseCount)
+                    shutil.copyfile(case, dstDir + "/" + copyName) 
                     currCollected += 1
                 envId += 1
             reoccurCount += 1
+            
+        d = {"caseID": caseID, "env": env, "goal": goal}
+        df = pd.DataFrame(data=d)
+        return df
             
         
      
     # numberPerCase = 200, graduateChangeCases = 100
     def gradual(self, numberPerCase, graduateChangeCases, periodList = ["normal", "gradual", "normal"]):
-        # dstDir = "gradual"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
         
@@ -175,6 +185,10 @@ class DriftGenerator:
         increasingProbStep = 100/graduateChangeCases
         probEnv0 = 100
         probEnv1 = 0
+        
+        caseID = []
+        env = []
+        goal = []
 
         for period in periodList:
 
@@ -183,12 +197,16 @@ class DriftGenerator:
                 currCollected = 0
                 while currCollected < numberPerCase:
                     envId = random.choices(envIdList, weights=(probEnv0, probEnv1), k=1)[0] # only one item in the list
-                    for goalId in range(self.numberOfGoal):
-                        case = copyStructure[envId][goalId].pop(0)
-                        print(case)
-                        caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
-                        shutil.copyfile(case, dstDir + "/" + copyName) 
+                    goalId = random.randint(0, self.numberOfGoal-1)
+                    case = copyStructure[envId][goalId].pop(0)
+
+                    caseCount += 1
+                    caseID.append(caseCount)
+                    env.append(envId)
+                    goal.append(goalId+1)
+
+                    copyName = "sas_plan.%s" % str(caseCount)
+                    shutil.copyfile(case, dstDir + "/" + copyName) 
                     currCollected += 1
 
             # gradual period
@@ -196,21 +214,31 @@ class DriftGenerator:
                 currCollected = 0
                 while currCollected < graduateChangeCases:
 
+                    
+                    envId = random.choices(envIdList, weights=(probEnv0, probEnv1), k=1)[0]
                     probEnv0 -= increasingProbStep
                     probEnv1 += increasingProbStep
-                    envId = random.choices(envIdList, weights=(probEnv0, probEnv1), k=1)[0]
+                    
+                    goalId = random.randint(0, self.numberOfGoal-1)
 
-                    for goalId in range(self.numberOfGoal):
-                        case = copyStructure[envId][goalId].pop(0)
-                        print(case)
-                        caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
-                        shutil.copyfile(case, dstDir + "/" + copyName) 
+                    case = copyStructure[envId][goalId].pop(0)
+
+                    caseCount += 1
+                    caseID.append(caseCount)
+                    env.append(envId)
+                    goal.append(goalId+1)
+
+                    copyName = "sas_plan.%s" % str(caseCount)
+                    shutil.copyfile(case, dstDir + "/" + copyName)
+                        
                     currCollected += 1
+                    
+        d = {"caseID": caseID, "env": env, "goal": goal}
+        df = pd.DataFrame(data=d)
+        return df
     
     # probOutlier = 0.05, numberPerCase = 300
     def outlier(self, numberPerCase, probOutlier):
-        # dstDir = "outlier"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
         
@@ -219,18 +247,30 @@ class DriftGenerator:
         probNormal = 1 - probOutlier
         envIdList = [0, 1]
         currCollected = 0
+        
+        caseID = []
+        env = []
+        goal = []
+        
         while currCollected < numberPerCase:
             envId = random.choices(envIdList, weights=(probNormal, probOutlier), k=1)[0] # only one item in the list
-            for goalId in range(self.numberOfGoal):
-                case = copyStructure[envId][goalId].pop(0)
-                print(case)
-                caseCount += 1
-                copyName = "sas_plan.%s" % str(caseCount)
-                shutil.copyfile(case, dstDir + "/" + copyName)
+            goalId = random.randint(0, self.numberOfGoal-1)
+            case = copyStructure[envId][goalId].pop(0)
+
+            caseCount += 1
+            caseID.append(caseCount)
+            env.append(envId)
+            goal.append(goalId+1)
+
+            copyName = "sas_plan.%s" % str(caseCount)
+            shutil.copyfile(case, dstDir + "/" + copyName)
             currCollected += 1
+            
+        d = {"caseID": caseID, "env": env, "goal": goal}
+        df = pd.DataFrame(data=d)
+        return df
 
     def incremental(self, numberPerCase, numEnv):
-        # dstDir = "incremental"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
         
@@ -280,7 +320,7 @@ class DriftGenerator:
                 if envId == numEnv:
                     not_intermediate = True
                     
-                
+
         d = {"caseID": caseID, "env": env, "goal": goal}
         df = pd.DataFrame(data=d)
         return df

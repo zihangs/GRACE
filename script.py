@@ -15,7 +15,9 @@ src_envs = "minidata"
 env_change_option = "-InitRW"
 
 # env_modifier: associated
-initRW_step = 10
+# initRW_step = 10
+step_percentage = 0.2
+
 
 
 # planner: mandatory
@@ -34,13 +36,12 @@ gradual_stable_period = 50
 gradual_changing_period = 50
 
 
-############################## env_modifier #############################
+# ############################## env_modifier #############################
 # change dir to modifier and run 
 os.chdir("./env_modifier")
 
 if env_change_option == "-InitRW":
-    steps = initRW_step
-    os.system("python3 runScript.py %s %s %s %s %s" % (src_envs, env_change_option, str(steps), str(lapktTimeout), str(lapktAttempts)) )
+    os.system("python3 runScript.py %s %s %s %s %s" % (src_envs, env_change_option, str(step_percentage), str(lapktTimeout), str(lapktAttempts)) )
 
 # the output dirName will be used by planner (next)
 output_fill_goals = src_envs + "_output_problems"
@@ -95,13 +96,17 @@ os.chdir("../")
 # output_plans = src_problems
 # # change dir back
 # os.chdir("../../")
-# ############################## drift generator ##############################
-
+############################## drift generator ##############################
+# copy the plans to drift_generator/
 # safeRemoveDir("./drift_generator/" + output_plans)
 # shutil.copytree("./planner/symk/" + output_plans, "./drift_generator/" + output_plans)
+
 # # move it to drift_generator/
 # # shutil.move("./planner/symk/" + output_plans, "./drift_generator/")
 # # change dir to drift_generator/
+
+# # output_plans = "output_plans"   ## need to delete
+
 # os.chdir("./drift_generator/")
 
 # plan_pool_root = output_plans

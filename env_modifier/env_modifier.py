@@ -10,6 +10,8 @@ def iterativeModify(args, timeout = 10, attempts = 20):
     oriHypsFile = oriDir + "/hyps.dat"
     method = args[2]  # "-ObjectRM", "-InitRW", "-GoalRW", "-ActionRM"
 
+    goals = 0
+
     modifySucceed = False
     for _ in range(attempts):
         if method == "-ObjectRM":
@@ -31,14 +33,16 @@ def iterativeModify(args, timeout = 10, attempts = 20):
         domain = "modified/domain.pddl"
         template = "modified/template.pddl"
         hyps = "modified/hyps.dat"
-        if lapkt_check.validate(timeout, domain, template, hyps):
+        valid_flag, _, goalNum = lapkt_check.validate_steps_goals(timeout, domain, template, hyps)
+        if valid_flag:
             modifySucceed = True
+            goals = goalNum
             break
 
     if not modifySucceed:
         safeRemoveDir("modified")
 
-    return modifySucceed
+    return modifySucceed, goals
 
 
 if __name__ == "__main__":
@@ -48,5 +52,5 @@ if __name__ == "__main__":
 
     # sys.argv = ["env_modifier.py", "dirOfDomainTemplateHyps", "-InitRW", "10"]
 
-    status = iterativeModify(sys.argv)
+    status, goals = iterativeModify(sys.argv)
     print("Modify Succeed? : " + str(status))

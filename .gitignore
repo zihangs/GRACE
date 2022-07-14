@@ -7,3 +7,5 @@ env_modifier/minidata_output_problems/
 env_modifier/minidata_output_templates/
 env_modifier/original/
 planner/symk/builds/
+env_modifier/goal_count.csv
+drift_generator/output_plans/
