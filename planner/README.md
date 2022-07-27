@@ -54,3 +54,60 @@ It will take a long time to run.
 
 Once the process is completed, check this directory, there will be a sub-directory `gene_data/`. All the domains, problems, tests and generated plans will be there. Then this directory will be used for our next steps for mining process models.
 
+
+
+
+
+
+
+Planner (symbolic top-k planner)
+
+
+
+The planner takes the modified environments or the original environments (in PDDL) as input, and it can generate a set of plans for a given goal candidate in a given environment.
+
+
+
+
+
+
+
+To run the python script `planner.py`, a few parameter need to be specified:
+
+
+
+Input: the environment, in this case the environment is a planning problem in PDDL format (includes domain.pddl & problem.pddl).
+
+
+
+Options:
+
+
+
+\1) `-Topk`: generate cost optimal plans
+
+\2) `-Diverse`: generate plans that deviate from each other.
+
+
+
+Number of plans: the number of plans you want to generate from achieving that given goal.
+
+
+
+Time limit: instruct the planner to stop if it can't found the required number of plans in the given amount of time, and return the all the found plans to that point.
+
+
+
+
+
+
+
+Examples of commands:
+
+
+
+\```sh
+
+\# python planner.py <input> <option> <number_of_plans> <time_limit>
+
+\```
