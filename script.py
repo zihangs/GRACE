@@ -4,26 +4,26 @@ from env_modifier.generalFunc import reCreateDir, safeRemoveDir
 
 
 # lapkt check: to configure in 
-lapktTimeout = 10   # in seconds
-lapktAttempts = 20  
+lapktTimeout = 100   # in seconds
+lapktAttempts = 10  
 ## training set
-trainingPlanPerGoal = 10
+trainingPlanPerGoal = 50
 
 ############################### parameters ###############################
 # env_modifier: mandatory
-src_envs = "minidata"
+src_envs = "ori_env"
 env_change_option = "-InitRW"
 
 # env_modifier: associated
 # initRW_step = 10
-step_percentage = 0.2
+step_percentage = 0.3
 
 
 
 # planner: mandatory
 planner_option = "-Topk"
 numPlans = 1000
-timeLimit = 60 # in seconds
+timeLimit = 600 # in seconds
 
 
 # drift_generator: mandatory
@@ -136,4 +136,18 @@ for domain in os.listdir(plan_pool_root):
 
 # change dir back
 os.chdir("../")
+
+############################ collect data ########################
+output_collection = "output_collection/"
+reCreateDir(output_collection)
+# os.mkdir(output_collection)
+shutil.move("./env_modifier/" + src_envs + "_output_problems" , output_collection)
+shutil.move("./env_modifier/" + src_envs + "_output_templates" , output_collection)
+shutil.move("./env_modifier/goal_count.csv", output_collection)
+
+shutil.move("./planner/symk/training" , output_collection)
+shutil.move("./planner/symk/" + src_envs + "_output_problems" , output_collection + src_envs + "_output_problems_plans" )
+
+shutil.move("./drift_generator/" + src_envs + "_output_problems" , output_collection + src_envs + "_output_problems_drift")
+
 

@@ -50,6 +50,8 @@ def safeCreateDir(dirName):
 args_script = sys.argv
 lapktTimeout = int(sys.argv[-2])
 lapktAttempts = int(sys.argv[-1])
+steps_percentage = float(sys.argv[3])
+
 
 src_data = args_script[1]
 output_templates = src_data + "_output_templates"
@@ -88,16 +90,13 @@ for domain in domains:
         valid_flag, steps, _ = validate_steps_goals(lapktTimeout, problem_dir+"/domain.pddl", problem_dir+"/template.pddl", problem_dir+"/hyps.dat")
         if valid_flag:     # then modify environment next
             # replace args[3] with real step number
-            stepsNum = ceil( float(args_env_modifier[3]) * steps ) 
+            stepsNum = ceil( steps_percentage * steps ) 
             args_env_modifier[3] = str( stepsNum )
 
-            print( "steps = " + str(steps) )  # this is average of steps
+            print( "total steps = " + str(steps) )  # this is average of steps
+            print( "stepsNum = " + str( stepsNum ))
         else:
             continue   # the original problem is invalid, go to next problem
-
-
-
-
 
 
         # exec
