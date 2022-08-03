@@ -421,6 +421,6 @@ shape_23
 )
 (:goal
 (and 
-      (at-robot place_6_9)
+      <HYPOTHESIS>
 )
 ))

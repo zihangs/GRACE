@@ -397,7 +397,7 @@
     )
 
     (:goal
-        (at-robot place_0_9)
+        <HYPOTHESIS>
     )
 
     
