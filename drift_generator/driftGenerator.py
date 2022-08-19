@@ -118,13 +118,13 @@ class DriftGenerator:
             while (currCollected < numberPerCase) and (currCollected < self.numberOfCaseLeast):
                 for goalId in range(self.numberOfGoal):
                     case = problemStructure[envId][goalId][currCollected]
-                    # print(case)
+                    print(case)
                     
                     caseCount += 1
                     caseID.append(caseCount)
                     env.append(envId)
                     
-                    copyName = "sas_plan.%s" % str(caseCount)
+                    copyName = "sas_plan_%s.%s" % (goalId, str(caseCount)) 
                     shutil.copyfile(case, dstDir + "/" + copyName)        
                 currCollected += 1
             envId += 1
@@ -155,7 +155,7 @@ class DriftGenerator:
                         case = copyStructure[envId][goalId].pop(0)
                         print(case)
                         caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
+                        copyName = "sas_plan_%s.%s" % (goalId, str(caseCount))
                         shutil.copyfile(case, dstDir + "/" + copyName) 
                     currCollected += 1
                 envId += 1
@@ -187,7 +187,7 @@ class DriftGenerator:
                         case = copyStructure[envId][goalId].pop(0)
                         print(case)
                         caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
+                        copyName = "sas_plan_%s.%s" % (goalId, str(caseCount))
                         shutil.copyfile(case, dstDir + "/" + copyName) 
                     currCollected += 1
 
@@ -204,7 +204,7 @@ class DriftGenerator:
                         case = copyStructure[envId][goalId].pop(0)
                         print(case)
                         caseCount += 1
-                        copyName = "sas_plan.%s" % str(caseCount)
+                        copyName = "sas_plan_%s.%s" % (goalId, str(caseCount))
                         shutil.copyfile(case, dstDir + "/" + copyName) 
                     currCollected += 1
     
@@ -225,7 +225,7 @@ class DriftGenerator:
                 case = copyStructure[envId][goalId].pop(0)
                 print(case)
                 caseCount += 1
-                copyName = "sas_plan.%s" % str(caseCount)
+                copyName = "sas_plan_%s.%s" % (goalId, str(caseCount))
                 shutil.copyfile(case, dstDir + "/" + copyName)
             currCollected += 1
 
@@ -256,7 +256,7 @@ class DriftGenerator:
                     env.append(envId/numEnv)
                     goal.append(goalId+1)
 
-                    copyName = "sas_plan.%s" % str(caseCount)
+                    copyName = "sas_plan_%s.%s" % (goalId, str(caseCount))
                     shutil.copyfile(case, dstDir + "/" + copyName)        
                     currCollected += 1
                 envId += 1
