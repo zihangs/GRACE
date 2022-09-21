@@ -4,11 +4,10 @@ import random
 from tarski.io import FstripsWriter
 from tarski.search.model import GroundForwardSearchModel
 from tarski.grounding.lp_grounding import ground_problem_schemas_into_plain_operators
-from generalFunc import loadPDDLProblem, restoreTemplate, reCreateDir, setHyps
+from generalFunc import loadPDDLProblem, restoreTemplate, reCreateDir, setHyps, top1Plans, editDistanceMatrix
 
 
-
-# random walk for n steps
+# random walk for n steps (not go back)
 def randomWalk(problem, steps):
     # create a gfs_model
     gfs_model = GroundForwardSearchModel(problem, ground_problem_schemas_into_plain_operators(problem))
@@ -35,7 +34,6 @@ def randomWalk(problem, steps):
     return problem
 
 
-
 def randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile):
     selectedGoal, tmpFile = setHyps(oriTemplateFile, oriHypsFile)
     
@@ -52,6 +50,10 @@ def randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile):
     shutil.copyfile(oriHypsFile, "modified/hyps.dat")
 
 
+############################# need put to another place ##################
+
+
+
 if __name__ == "__main__":
     #############################################################
     # steps of random walk:
@@ -63,5 +65,17 @@ if __name__ == "__main__":
     oriHypsFile = "original/hyps.dat"
     #############################################################
 
+    # generates a folder that contains domain.pddl, template.pddl, and hyps.dat
     randomWalkInit(steps, oriDomainFile, oriTemplateFile, oriHypsFile)
+
+    
+
+    ################## added codes for trial #########################
+    # check if valid:
+    tfFlag1, steps_collection_modified, _ = top1Plans("modified", 100)
+    tfFlag2, steps_collection_original, _ = top1Plans("original", 100)
+    if tfFlag1 and tfFlag2:
+        tf, matrix = editDistanceMatrix(steps_collection_modified, steps_collection_original)
+        print(tf)
+        print(matrix)
 

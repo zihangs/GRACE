@@ -4,11 +4,10 @@ import re
 import random
 import sys
 import shutil
-import numpy as np
 from math import ceil
-from statistics import mean
 from env_modifier import iterativeModify
-from generalFunc import templateFillGoals, top1Plans, editDistanceMatrix, safeRemoveDir
+from generalFunc import templateFillGoals
+from lapkt_check import validate_steps_goals
 
 def listAllSubDir(path, flag="default"):
     pathList = []
@@ -49,8 +48,8 @@ def safeCreateDir(dirName):
 ##############################################
 # args_script = ["runScript.py", "source_data", "-InitRW", "10", lapktTimeout, lapktAttempts]
 args_script = sys.argv
-plannerTimeout = int(sys.argv[-2])
-numAttempts = int(sys.argv[-1])
+lapktTimeout = int(sys.argv[-2])
+lapktAttempts = int(sys.argv[-1])
 steps_percentage = float(sys.argv[3])
 
 
@@ -85,57 +84,25 @@ for domain in domains:
 
 
 
+
+
         # check steps: (check the original problem only once):   for random walk:
-        # valid_flag, steps, _ = validate_steps_goals(plannerTimeout, problem_dir+"/domain.pddl", problem_dir+"/template.pddl", problem_dir+"/hyps.dat")
-        original_flag, steps_collection_original, _ = top1Plans(problem_dir, plannerTimeout)
-        if original_flag:     # then modify environment next
-            print(steps_collection_original)
-            averSteps = mean([len(x) for x in steps_collection_original])
+        valid_flag, steps, _ = validate_steps_goals(lapktTimeout, problem_dir+"/domain.pddl", problem_dir+"/template.pddl", problem_dir+"/hyps.dat")
+        if valid_flag:     # then modify environment next
             # replace args[3] with real step number
-            stepsNum = ceil( steps_percentage * averSteps ) 
+            stepsNum = ceil( steps_percentage * steps ) 
             args_env_modifier[3] = str( stepsNum )
 
-            print( "total steps = " + str(averSteps) )  # this is average of steps
-            print( "stepsNum = " + str( stepsNum ))  # use this as a threshold to measure the averaged edit distance
+            print( "total steps = " + str(steps) )  # this is average of steps
+            print( "stepsNum = " + str( stepsNum ))
         else:
             continue   # the original problem is invalid, go to next problem
 
 
         # exec
-        valid_distance = False
-        i = 0
-        while i < numAttempts:
-            modifier_flag, goals = iterativeModify(args_env_modifier, timeout=plannerTimeout, attempts=numAttempts)
+        status, goals = iterativeModify(args_env_modifier, timeout=lapktTimeout, attempts=lapktAttempts)
 
-            # check edit distance
-            if original_flag and modifier_flag:
-                _, steps_collection_modified, goalNum = top1Plans("modified", plannerTimeout)
-                greaterThanDiagonal, matrix = editDistanceMatrix(steps_collection_modified, steps_collection_original)
-
-                # metric 1
-                averageDiag = mean(np.diag(matrix))
-                # m1 = min([len(x) for x in steps_collection_original])
-                # m2 = min([len(x) for x in steps_collection_modified])
-                # and m2 >= m1
-                if averageDiag > stepsNum:
-                    valid_distance = True
-                    break
-
-                # # metric 2
-                # trueNum = len([x for x in greaterThanDiagonal if x != "false"])
-                # if trueNum > len(greaterThanDiagonal)/2:
-                #     valid_distance = True
-                #     break
-                else:
-                    safeRemoveDir("tmp_modified")
-                    shutil.move("modified/", "tmp_modified/")
-                    args_env_modifier[1] = "tmp_modified/"
-            
-            i+=1
-
-
-        if valid_distance:
-
+        if status:
             f_goal_count.write(problem_dir + "," + str(goals) + "\n")
 
             problem_dir_output = problem_dir.replace(src_data, output_plan_problems)
@@ -149,7 +116,6 @@ for domain in domains:
             template_dir_output = problem_dir.replace(src_data, output_templates)
             # move and rename
             shutil.move("modified/", template_dir_output)
-            
-            
-safeRemoveDir("tmp_modified")
+
+
 f_goal_count.close()

@@ -118,8 +118,8 @@ def randomWalkBack(problem, operators, steps):
         succ = gbs_model.backSuccessors(currState)
         # elem in succ is a tuple (operator, state)
         sel = random.choice(list(succ))
-        # print(sel)
-        # print("\n")
+        print(sel)
+        print("\n")
         currState = sel[1]  # select and re-assign the state
         stepCount += 1
 
@@ -131,9 +131,9 @@ if __name__ == "__main__":
     #########################################################
     steps = 10  # steps for random walk for each goal
 
-    oriDomainFile = "original/grid/domain.pddl"
-    oriTemplateFile = "original/grid/template.pddl"
-    oriHypsFile = "original/grid/hyps.dat"
+    oriDomainFile = "original/domain.pddl"
+    oriTemplateFile = "original/template.pddl"
+    oriHypsFile = "original/hyps.dat"
     #########################################################
 
     f = open(oriHypsFile, "r")

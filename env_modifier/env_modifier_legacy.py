@@ -1,6 +1,6 @@
 import sys
-import ActionRM, GoalRW, InitRW, ObjectRM
-from generalFunc import safeRemoveDir, top1Plans
+import ActionRM, GoalRW, InitRW, ObjectRM, lapkt_check
+from generalFunc import safeRemoveDir
 
 # default: lapkt timeout = 10s ; try to generate valid env for 20 times
 def iterativeModify(args, timeout = 10, attempts = 20):
@@ -29,11 +29,11 @@ def iterativeModify(args, timeout = 10, attempts = 20):
         else:
             raise Exception("Method not found.")
 
-        # # check with lapkt
-        # valid_flag, _, goalNum = lapkt_check.validate_steps_goals(timeout, "modified/domain.pddl", "modified/template.pddl", "modified/hyps.dat")
-
-        # check using top-k planner
-        valid_flag, _, goalNum = top1Plans("modified", timeout)
+        # check if valid (lapkt)
+        domain = "modified/domain.pddl"
+        template = "modified/template.pddl"
+        hyps = "modified/hyps.dat"
+        valid_flag, _, goalNum = lapkt_check.validate_steps_goals(timeout, domain, template, hyps)
         if valid_flag:
             modifySucceed = True
             goals = goalNum

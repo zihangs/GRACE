@@ -136,8 +136,8 @@ class DriftGenerator:
         
         
             
-    # numberPerCase = 200, reoccurTimes = 3, 
-    def reoccuring(self, numberPerCase, reoccurTimes):
+    # casePerEnv = 200, reoccurTimes = 3, 
+    def reoccuring(self, casePerEnv, reoccurTimes):
         # dstDir = "reoccuring"
         dstDir = self.outputDir
         safeCreateDir(dstDir)
@@ -149,7 +149,7 @@ class DriftGenerator:
             envId = 0
             while envId < self.numberOfEnv:
                 currCollected = 0
-                while currCollected < numberPerCase:
+                while currCollected < casePerEnv:
                     for goalId in range(numberOfGoal):
                         # need pop out the first item
                         case = copyStructure[envId][goalId].pop(0)
@@ -307,3 +307,8 @@ if __name__ == "__main__":
         changing_period = int(sys.argv[4])
         dg.gradual(stable_period, changing_period)
 
+    # test this
+    if option == "-Reoccurring":
+        casePerEnv = int(sys.argv[3])
+        reoccurTimes = int(sys.argv[4])
+        dg.reoccuring(casePerEnv, reoccurTimes)

@@ -16,7 +16,7 @@ env_change_option = "-InitRW"
 
 # env_modifier: associated
 # initRW_step = 10
-step_percentage = 0.3
+step_percentage = 2.0
 
 
 
