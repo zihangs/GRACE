@@ -2,7 +2,7 @@
 
 ### Running Environment
 
-The docker image can be found [here](https://hub.docker.com/repository/docker/suzihang/grace).
+The docker image can be found [here](https://hub.docker.com/r/suzihang/grace).
 
 docker run -it -v PathToGRACE:/mnt suzihang/grace /bin/bash
 
