@@ -235,7 +235,7 @@ def drift_generator(output_plans):
 
 
 
-# output_fill_goals = env_modifier(src_envs)
+output_fill_goals = env_modifier(src_envs)
 
 # if len(os.listdir("./ori_env_output_problems")) != 0:
 #     output_fill_goals = "./ori_env_output_problems"
@@ -254,8 +254,8 @@ def drift_generator(output_plans):
 # trainingSetPartition("ori_env_output_problems_src_plans")
 
 
-output_plans = "ori_env_output_problems_plans"
-drift_generator(output_plans)
+# output_plans = "ori_env_output_problems_plans"
+# drift_generator(output_plans)
 
 # ############################ collect data ########################
 # output_collection = "output_collection/"
